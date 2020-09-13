@@ -6,5 +6,12 @@ module.exports = {
     // MongoDB connection String
     MONGO_CONNECTION_STRING: process.env.MONGO_CONNECTION_STRING,
     // Allowed upload file formats
-    ALLOWED_UPLOAD_FILE_FORMATS: ['.csv', '.xlsx']
+    ALLOWED_UPLOAD_FILE_FORMATS: ['.csv', '.xlsx'],
+    // Default Fetch params
+    FETCH_DEFAULT: {
+        PAGE: 1,
+        LIMIT: 10,
+        SKIP: 0,
+        SELECT: ""
+    }
 }

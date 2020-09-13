@@ -1,6 +1,8 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema;
 
+const Policies = require('./policies');
+
 const UserSchema = new Schema({
     firstName: {
         type: String,
@@ -36,10 +38,20 @@ const UserSchema = new Schema({
         lowercase: true,
         enum: ['male', 'female']
     },
+}, {
+    timestamps: true,
+    toJSON: { virtuals: true }
+});
 
-
-}, { timestamps: true });
+// Policies taken by users
+UserSchema.virtual('policies', {
+    ref: Policies,
+    localField: '_id',
+    foreignField: 'user',
+    justOne: false,
+});
 
 UserSchema.index({ email: 1 });
+UserSchema.index({ firstName: 'text' });
 
 module.exports = mongoose.model('Users', UserSchema);
