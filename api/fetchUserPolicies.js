@@ -16,7 +16,7 @@ const getUserPolicies = async (req, res, next) => {
         // Search Query
         const query = {
             $text: { 
-                "$search": searchText,
+                "$search": searchText || "",
                 "$caseSensitive": false
             }
         }
@@ -33,7 +33,7 @@ const getUserPolicies = async (req, res, next) => {
     } catch (error) {
         if (typeof error !== ErrorHandler)
         error = new ErrorHandler(error.statusCode || INTERNAL_SERVER_ERROR, error.message || error);
-    next(error);
+        next(error);
     }
 }
 

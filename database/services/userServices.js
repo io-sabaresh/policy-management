@@ -31,7 +31,39 @@ const fetchUserPolicies = async (
     }
 }
 
+
+const fetchAggregatedUserPolicies = async ({
+    match = {},
+    sort = { createdAt: -1 },
+    select = { email: 1, firstName: 1 },
+    skip = FETCH_DEFAULT.SKIP,
+    limit = FETCH_DEFAULT.LIMIT
+}) => {
+    try {
+        const result = await Users.aggregate([
+            { $match: match },
+            { $sort: sort },
+            { $skip: skip },
+            { $limit: limit },
+            { $project: select },
+            {
+                $lookup: {
+                    from: "policies",
+                    localField: '_id',
+                    foreignField: 'user',
+                    as: 'policies'
+                }
+            }
+        ]);
+
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
+
 module.exports = {
     updateUser,
-    fetchUserPolicies
+    fetchUserPolicies,
+    fetchAggregatedUserPolicies
 }
