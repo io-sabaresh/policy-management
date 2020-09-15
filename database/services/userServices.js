@@ -62,8 +62,61 @@ const fetchAggregatedUserPolicies = async ({
     }
 }
 
+
+const getDistinctAccountsByZip = async (req, res) => {
+    try {
+        const users = await Users.aggregate([
+            {
+                $group: {
+                    _id: "$zip",
+                    users: { $addToSet: "$_id" }
+                }
+            },
+            {
+                $lookup: {
+                    from: "policies",
+                    localField: 'users',
+                    foreignField: 'user',
+                    as: 'policies'
+                }
+            },
+            { $unwind: "$policies" },
+            {
+                $group: {
+                    _id: "$_id",
+                    carrier: { $addToSet: "$policies.policyCarrier" },
+                    category: { $addToSet: "$policies.policyCategory" },
+                    account: { $addToSet: "$policies.userAccount" }
+                }
+            },
+            {
+                $project: {
+                    "_id": 0,
+                    zip: "$_id",
+                    carriersCount: {
+                        $size: "$carrier"
+                    },
+                    categoriesCount: {
+                        $size: "$category"
+                    },
+                    numberOfAccounts: {
+                        $size: "$account"
+                    }
+                }
+            }
+        ]);
+
+        res.status(200).json({ users });
+    } catch (error) {
+        res.status(500).json({ error });
+    }
+}
+
+
 module.exports = {
     updateUser,
     fetchUserPolicies,
-    fetchAggregatedUserPolicies
+    fetchAggregatedUserPolicies,
+
+    getDistinctAccountsByZip
 }
